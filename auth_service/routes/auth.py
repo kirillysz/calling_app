@@ -29,3 +29,16 @@ async def token(
     )
 
     return user_with_token
+
+@router.post("/login", response_model=Token)
+async def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: AsyncSession = Depends(get_db)
+) -> Token:
+    token = await UserCrud.login_user(
+        db=db,
+        email=form_data.username,
+        password=form_data.password
+    )
+    
+    return token

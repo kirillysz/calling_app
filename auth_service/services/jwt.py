@@ -24,8 +24,14 @@ def create_access_token(data: dict) -> str:
     return encode_jwt
 
 
-def decrypt_token(token: str) -> dict | bool:
+def decrypt_token(token: str) -> str | None:
     try:
-        return jwt.decode(token=token, key=auth_data["secret_key"])
-    except JWTError as _err:
-        return False
+        payload = jwt.decode(token, auth_data["secret_key"], algorithms=[auth_data["algorithm"]])
+        user_id = payload.get("sub")
+        if user_id is None:
+            return None
+        
+        return str(user_id) 
+    except JWTError as e:
+        print(f"Error decoding JWT: {e}")
+        return None
